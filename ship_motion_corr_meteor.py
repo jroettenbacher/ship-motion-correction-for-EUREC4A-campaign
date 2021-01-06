@@ -9,13 +9,10 @@
 # importing necessary libraries
 import numpy as np
 import netCDF4 as nc4
-from netCDF4 import Dataset
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib import rcParams
 import matplotlib
-import glob
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -35,7 +32,7 @@ pathFolderTree = '/projekt2/remsens/data_new/site-campaign/rv_meteor-eurec4a'
 pathFig = f'{pathFolderTree}/ship_motion_correction/plots'
 pathNcDataAnc = f'{pathFolderTree}/ship_motion_correction/ncdf_ancillary'
 
-### instrument position coordinates [+5.15m; +5.40m;−15.60m]
+# instrument position coordinates [+5.15m; +5.40m;−15.60m]
 r_FMCW = [-11., 4.07, -15.8]  # [m]
 
 # select a date
@@ -700,7 +697,7 @@ def tick_function(X):
 print(f'processing date: {date:%Y-%m-%d}')
 print('* reading ship data')
 if Hrz == 1:
-    dataset = pd.read_csv(f'{pathFolderTree}/instruments/RV-METEOR_DSHIP/{date}_DSHIP_all_1Hz.dat', \
+    dataset = pd.read_csv(f'{pathFolderTree}/instruments/RV-METEOR_DSHIP/{date}_DSHIP_all_1Hz.dat',
                           sep="\t", encoding='windows-1252', header=0, skiprows=[1, 2])  # , \
     timeShipArr = dataset['SYS.CALC.Timestamp'].values
     unitsShipArr = 'seconds since 1970-01-01 00:00:00'
@@ -738,7 +735,7 @@ ShipDataset = xr.Dataset(data_vars=variables,
                          attrs=global_attributes)
 
 # slice one hour of data 
-shipDataHour = ShipDataset.sel(time=slice(datetime(int(yy), int(mm), int(dd), int(hour), 0, 0), \
+shipDataHour = ShipDataset.sel(time=slice(datetime(int(yy), int(mm), int(dd), int(hour), 0, 0),
                                           datetime(int(yy), int(mm), int(dd), int(hour) + 1, 0, 0)))
 
 # shifting time stamp for ship data hour
@@ -775,9 +772,9 @@ w_ship = w_rot + w_heave
 
 # Take from the ship data only the valid times where roll and pitch are not -999 (or nan) - i assume gaps are short and rare
 # select valid values of ship time series
-i_valid = np.where(~np.isnan(rollHour) * \
-                   ~np.isnan(pitchHour) * \
-                   ~np.isnan(heaveHour) * \
+i_valid = np.where(~np.isnan(rollHour) *
+                   ~np.isnan(pitchHour) *
+                   ~np.isnan(heaveHour) *
                    ~np.isnan(w_ship))
 
 w_ship_valid = w_ship[i_valid]
@@ -858,19 +855,19 @@ NtimeRadar = len(datetimeRadar)
 Nchirps = len(chirpIntegrations)
 
 # plot on mean doppler velocity time height
-plot_2Dmaps(datetimeRadar, \
-            rangeRadar, \
-            mdv, \
-            'Mean Doppler velocity', \
-            -6., \
-            4., \
-            100., \
-            2200., \
-            timeStartDay, \
-            timeEndDay, \
-            'seismic', \
-            date, \
-            'meanDopplerVel', \
+plot_2Dmaps(datetimeRadar,
+            rangeRadar,
+            mdv,
+            'Mean Doppler velocity',
+            -6.,
+            4.,
+            100.,
+            2200.,
+            timeStartDay,
+            timeEndDay,
+            'seismic',
+            date,
+            'meanDopplerVel',
             pathFig)
 
 # %%
@@ -941,11 +938,11 @@ for i_chirp in range(0, Nchirps):
     rangeChirp = rangeRadar[i_h_min:i_h_max]
 
     # # search for at least 10 min of consecutive w obs in the chirp
-    w_radar, timeRadarSel, w_radar_meanCol = f_findMdvTimeSerie(mvd_chirp, \
-                                                                timeSerieRadar, \
-                                                                rangeChirp, \
-                                                                NtimeStampsRun, \
-                                                                pathFig, \
+    w_radar, timeRadarSel, w_radar_meanCol = f_findMdvTimeSerie(mvd_chirp,
+                                                                timeSerieRadar,
+                                                                rangeChirp,
+                                                                NtimeStampsRun,
+                                                                pathFig,
                                                                 chirp)
 
     # selecting wship values of the chirp over the same time interval
@@ -954,13 +951,13 @@ for i_chirp in range(0, Nchirps):
 
     # calculating time shift for the chirp
     if np.sum(np.where(~np.isnan(w_radar_meanCol))) != 0:
-        timeShiftArray[i_chirp] = f_calcTimeShift(w_radar_meanCol, \
-                                                  DeltaTimeShift, \
-                                                  w_ship_chirpSel, \
-                                                  timeRadarSel, \
-                                                  pathFig, \
-                                                  chirp, \
-                                                  date, \
+        timeShiftArray[i_chirp] = f_calcTimeShift(w_radar_meanCol,
+                                                  DeltaTimeShift,
+                                                  w_ship_chirpSel,
+                                                  timeRadarSel,
+                                                  pathFig,
+                                                  chirp,
+                                                  date,
                                                   hour)
     else:
         timeShiftArray[i_chirp] = np.nan
@@ -1116,13 +1113,7 @@ ax.loglog(freq_rot, pow_wrot, label='w_rot', color='purple')
 ax.loglog(freq_heave, pow_wheave, label='w_heave', color='orange')
 ax.legend(frameon=False)
 ax2 = ax.twiny()
-new_tick_locations = np.array([0.2, \
-                               0.1, \
-                               0.06666667, \
-                               0.05, \
-                               0.04, \
-                               0.02, \
-                               0.01666667])
+new_tick_locations = np.array([0.2, 0.1, 0.06666667, 0.05, 0.04, 0.02, 0.01666667])
 ax2.set_xlabel('periods [s]')
 ax2.set_xscale('log')
 ax2.set_xlim(ax.get_xlim())
@@ -1140,15 +1131,9 @@ matplotlib.rc('ytick', labelsize=labelsizeaxes)  # sets dimension of ticks in th
 axt.loglog(freq_radarOrig, pow_radarOrig, label='radar', color='black')
 axt.loglog(freq_radarCorr, pow_radarCorr, label='corr with time shift', color='pink')
 
+new_tick_locations = np.array([0.2, 0.1, 0.06666667, 0.05, 0.04, 0.02, 0.01666667])
 axt.legend(frameon=False)
 axt2 = ax.twiny()
-new_tick_locations = np.array([0.2, \
-                               0.1, \
-                               0.06666667, \
-                               0.05, \
-                               0.04, \
-                               0.02, \
-                               0.01666667])
 axt2.set_xlabel('periods [s]')
 axt2.set_xscale('log')
 axt2.set_xlim(ax.get_xlim())
@@ -1168,13 +1153,7 @@ axtt.loglog(freq_radarCorr_NS, pow_radarCorr_NS, label='corr without time shift'
 
 axtt.legend(frameon=False)
 axtt2 = ax.twiny()
-new_tick_locations = np.array([0.2, \
-                               0.1, \
-                               0.06666667, \
-                               0.05, \
-                               0.04, \
-                               0.02, \
-                               0.01666667])
+new_tick_locations = np.array([0.2, 0.1, 0.06666667, 0.05, 0.04, 0.02, 0.01666667])
 axtt2.set_xlabel('periods [s]')
 axtt2.set_xscale('log')
 axtt2.set_xlim(ax.get_xlim())
