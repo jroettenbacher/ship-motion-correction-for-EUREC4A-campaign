@@ -294,7 +294,7 @@ def plot_2Dmaps(time,height,y,ystring,ymin, ymax, hmin, hmax, timeStartDay, time
     cbar.set_label(label=ystring, size=fontSizeCbar)
     cbar.ax.tick_params(labelsize=labelsizeaxes)
     fig.tight_layout()
-    fig.savefig(f'{pathFig}/{date}_{yVarName}_2dmaps.png', format='png')
+    fig.savefig(f'{pathFig}/{date:%Y%m%d}_{yVarName}_2dmaps.png', format='png')
 def f_shiftTimeDataset(dataset):
     '''
     author: Claudia Acquistapace
@@ -429,7 +429,7 @@ def plot_timeSeries(x,y, ystring,ymin, ymax, timeStartDay, timeEndDay, date, yVa
     ax.set_xlabel("time [hh:mm]", fontsize=fontSizeX)
     ax.set_ylabel(ystring, fontsize=fontSizeY)
     fig.tight_layout()
-    fig.savefig(f'{pathFig}/{date}_{yVarName}_timeSeries.png', format='png')
+    fig.savefig(f'{pathFig}/{date:%Y%m%d}_{yVarName}_timeSeries.png', format='png')
 def read_seapath(date, path=pathFolderTree+'/instruments/RV-METEOR_DSHIP/', **kwargs):
     """
     author: Johannes Roettenbacher
@@ -1000,7 +1000,7 @@ for i_chirp in range(0,Nchirps):
     ax.set_xlabel("time [hh:mm:ss]", fontsize=fontSizeX)
     ax.set_ylabel('w [m s-1]', fontsize=fontSizeY)
     fig.tight_layout()
-    fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_{str(i_chirp)}_timeSerie_wship_wradar.png', format='png')
+    fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_{str(i_chirp)}_timeSeries_wship_wradar.png', format='png')
 
     # building correction term matrix
     correctionMatrix[:,i_h_min:i_h_max] = - np.repeat(W_ship1_exact, len(rangeChirp)).reshape(len(timeExact), len(rangeChirp))
