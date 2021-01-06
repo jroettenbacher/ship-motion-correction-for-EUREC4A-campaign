@@ -32,7 +32,7 @@ NdaysEurec4a = len(Eurec4aDays)
 
 # paths to the different data files and output directories for plots
 pathFolderTree  = '/projekt2/remsens/data_new/site-campaign/rv_meteor-eurec4a'
-pathFig         = f'{pathFolderTree}/ship_motion_correction/plots/meteor'
+pathFig         = f'{pathFolderTree}/ship_motion_correction/plots'
 pathNcDataAnc   = f'{pathFolderTree}/ship_motion_correction/ncdf_ancillary'
 
 ### instrument position coordinates [+5.15m; +5.40m;−15.60m]
@@ -287,14 +287,14 @@ def plot_2Dmaps(time,height,y,ystring,ymin, ymax, hmin, hmax, timeStartDay, time
     cax = ax.pcolormesh(time, height, y.transpose(), vmin=ymin, vmax=ymax, cmap=colormapName)
     ax.set_ylim(hmin,hmax)                                               # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
     ax.set_xlim(timeStartDay, timeEndDay)                                 # limits of the x-axes
-    ax.set_title('time-height plot for the day : '+date, fontsize=fontSizeTitle, loc='left')
+    ax.set_title(f'time-height plot for the day : {date:%Y-%m-%d}', fontsize=fontSizeTitle, loc='left')
     ax.set_xlabel("time [hh:mm]", fontsize=fontSizeX)
     ax.set_ylabel("height [m]", fontsize=fontSizeY)
     cbar = fig.colorbar(cax, orientation='vertical', aspect=cbarAspect)
     cbar.set_label(label=ystring, size=fontSizeCbar)
     cbar.ax.tick_params(labelsize=labelsizeaxes)
     fig.tight_layout()
-    fig.savefig(pathFig+date+'_'+yVarName+'_2dmaps.png', format='png')
+    fig.savefig(f'{pathFig}/{date}_{yVarName}_2dmaps.png', format='png')
 def f_shiftTimeDataset(dataset):
     '''
     author: Claudia Acquistapace
@@ -425,11 +425,11 @@ def plot_timeSeries(x,y, ystring,ymin, ymax, timeStartDay, timeEndDay, date, yVa
     ax.xaxis_date()
     ax.set_ylim(ymin,ymax)                                               # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
     ax.set_xlim(timeStartDay, timeEndDay)                                 # limits of the x-axes
-    ax.set_title('time serie for the day : '+date, fontsize=fontSizeTitle, loc='left')
+    ax.set_title(f'time serie for the day : {date:%Y-%m-%d}', fontsize=fontSizeTitle, loc='left')
     ax.set_xlabel("time [hh:mm]", fontsize=fontSizeX)
     ax.set_ylabel(ystring, fontsize=fontSizeY)
     fig.tight_layout()
-    fig.savefig(pathFig+date+'_'+yVarName+'_timeSerie.png', format='png')
+    fig.savefig(f'{pathFig}/{date}_{yVarName}_timeSeries.png', format='png')
 def read_seapath(date, path=pathFolderTree+'/instruments/RV-METEOR_DSHIP/', **kwargs):
     """
     author: Johannes Roettenbacher
@@ -448,7 +448,7 @@ def read_seapath(date, path=pathFolderTree+'/instruments/RV-METEOR_DSHIP/', **kw
     # unpack kwargs
     nrows = kwargs['nrows'] if 'nrows' in kwargs else None
     skiprows = kwargs['skiprows'] if 'skiprows' in kwargs else (1, 2)
-    if date < datetime.datetime(2020, 1, 27):
+    if date < datetime(2020, 1, 27):
         file = f"{date:%Y%m%d}_DSHIP_seapath_1Hz.dat"
     else:
         file = f"{date:%Y%m%d}_DSHIP_seapath_10Hz.dat"
@@ -609,11 +609,11 @@ def f_calcTimeShift(w_radar_meanCol, DeltaTimeShift, w_ship_chirp, timeSerieRada
     #ax.xaxis_date()
     ax.set_ylim(-0.1,2.)                                               # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
     ax.set_xlim(DeltaTmin,DeltaTmax)                                 # limits of the x-axes
-    ax.set_title('covariance and sharpiness for chirp '+chirp+': '+date+' '+hour+':'+str(int(hour)+1)+', time lag found : '+str(DeltaTimeShift[indMin]), fontsize=fontSizeTitle, loc='left')
+    ax.set_title(f'covariance and sharpiness for chirp {chirp}: {date:%Y-%m-%d} {hour}:{str(int(hour) + 1)}, time lag found : {str(DeltaTimeShift[indMin])}', fontsize=fontSizeTitle, loc='left')
     ax.set_xlabel("time Shift [seconds]", fontsize=fontSizeX)
     ax.set_ylabel('w [m s-1]', fontsize=fontSizeY)
     fig.tight_layout()
-    fig.savefig(pathFig+date+'_'+hour+'_'+chirp+'_timeShiftQuicklook.png', format='png')
+    fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_{chirp}_timeShiftQuicklook.png', format='png')
     
     return(timeShift_chirp)       
 def f_calcFftSpectra(vel, time):
@@ -808,7 +808,7 @@ fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_wship_heave_timeSerie.png', format=
 
 #%%
 # reading radar data 
-radarData          = xr.open_mfdataset(f'{pathFolderTree}instruments/LIMRAD94/Y2020/M{mm}/D{dd}/{date:%y%m%d}_{hour}*_P07_ZEN.LV1.NC')
+radarData          = xr.open_mfdataset(f'{pathFolderTree}/instruments/LIMRAD94/Y2020/M{mm}/D{dd}/{date:%y%m%d}_{hour}*_P07_ZEN.LV1.NC')
 datetimeRadar      = nc4.num2date(radarData['Time'].values, 'seconds since 2001-01-01 00:00:00', only_use_cftime_datetimes=False)
 C1Range            = radarData['C1Range'].values
 C2Range            = radarData['C2Range'].values
