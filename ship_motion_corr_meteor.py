@@ -32,7 +32,7 @@ NdaysEurec4a = len(Eurec4aDays)
 
 # paths to the different data files and output directories for plots
 pathFolderTree  = '/projekt2/remsens/data_new/site-campaign/rv_meteor-eurec4a/'
-pathFig         = pathFolderTree+'/ship_motion_correction/plots/'
+pathFig         = pathFolderTree+'/ship_motion_correction/plots/meteor/'
 pathNcDataAnc   = pathFolderTree+'/ship_motion_correction/ncdf_ancillary/'
 
 ### instrument position coordinates [+5.15m; +5.40m;−15.60m]
@@ -45,7 +45,7 @@ dayEu           = Eurec4aDays[-4]
 yy              = str(dayEu)[0:4]
 mm              = str(dayEu)[5:7]
 dd              = str(dayEu)[8:10]
-date            = datetime.strptime(yy+mm+dd, "%Y%m%d")
+date            = yy+mm+dd
 
 # selecting hour to be processed
 hour            = '16'
@@ -448,7 +448,7 @@ def read_seapath(date, path=pathFolderTree+'/instruments/RV-METEOR_DSHIP/', **kw
     # unpack kwargs
     nrows = kwargs['nrows'] if 'nrows' in kwargs else None
     skiprows = kwargs['skiprows'] if 'skiprows' in kwargs else (1, 2)
-    if date < datetime(2020, 1, 27):
+    if date < datetime.datetime(2020, 1, 27):
         file = f"{date:%Y%m%d}_DSHIP_seapath_1Hz.dat"
     else:
         file = f"{date:%Y%m%d}_DSHIP_seapath_10Hz.dat"
@@ -671,7 +671,7 @@ def tick_function(X):
 
 #%%
 # processing of the selected hour
-print(f'processing date: {date:%Y-%m-%d}')
+print('processing date: '+date)
 print('* reading ship data')
 if Hrz == 1:     
     dataset      = pd.read_csv(pathFolderTree+'/ship_meteor_data/'+date+'_DSHIP_all_1Hz.dat',\
@@ -800,11 +800,11 @@ ax.legend(frameon=False)
 ax.xaxis_date()
 ax.set_ylim(-1.5,1.5)                                               # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
 ax.set_xlim(timeStartDay, timeEndDay)                                 # limits of the x-axes
-ax.set_title(f'time series for the day : {date:%Y%-%m-%d} - no time shift', fontsize=fontSizeTitle, loc='left')
+ax.set_title('time serie for the day : '+date+' - no time shift', fontsize=fontSizeTitle, loc='left')
 ax.set_xlabel("time [hh:mm:ss]", fontsize=fontSizeX)
 ax.set_ylabel('w [m s-1]', fontsize=fontSizeY)
 fig.tight_layout()
-fig.savefig(pathFig+f'{date:%Y%m%d}_'+hour+'_wship_heave_timeSerie.png', format='png')
+fig.savefig(pathFig+date+'_'+hour+'_wship_heave_timeSerie.png', format='png')
 
 #%%
 # reading radar data 
@@ -844,7 +844,7 @@ plot_2Dmaps(datetimeRadar, \
             timeStartDay, \
             timeEndDay, \
             'seismic', \
-            date.strftime("%Y%m%d"), \
+            date, \
             'meanDopplerVel', \
             pathFig)
 
@@ -935,7 +935,7 @@ for i_chirp in range(0,Nchirps):
                                                   timeRadarSel, \
                                                   pathFig, \
                                                   chirp, \
-                                                  date.strftime("%Y%m%d"), \
+                                                  date, \
                                                   hour)
     else:
         timeShiftArray[i_chirp] = np.nan
@@ -996,11 +996,11 @@ for i_chirp in range(0,Nchirps):
     ax.legend(frameon=False)
                                             # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
     ax.set_xlim(timeStart,timeEnd)                                 # limits of the x-axes
-    ax.set_title(f'velocity for time delay calculations : {date}' +hour+':'+str(int(hour)+1)+' shift = '+str(timeShiftArray[i_chirp]), fontsize=fontSizeTitle, loc='left')
+    ax.set_title('velocity for time delay calculations : '+date+' '+hour+':'+str(int(hour)+1)+' shift = '+str(timeShiftArray[i_chirp]), fontsize=fontSizeTitle, loc='left')
     ax.set_xlabel("time [hh:mm:ss]", fontsize=fontSizeX)
     ax.set_ylabel('w [m s-1]', fontsize=fontSizeY)
     fig.tight_layout()
-    fig.savefig(f'{pathFig}{date}'+'_'+hour+'_'+str(i_chirp)+'_timeSerie_wship_wradar.png', format='png')
+    fig.savefig(pathFig+date+'_'+hour+'_'+str(i_chirp)+'_timeSerie_wship_wradar.png', format='png')
 
     # building correction term matrix
     correctionMatrix[:,i_h_min:i_h_max] = - np.repeat(W_ship1_exact, len(rangeChirp)).reshape(len(timeExact), len(rangeChirp))
@@ -1010,7 +1010,7 @@ mdv_corr = mdv + correctionMatrix
 #%%
 
 # plot of the 2d map of mean doppler velocity corrected for the selected hour
-plot_2Dmaps(datetimeRadar,rangeRadar,mdv_corr,'mdv corrected', -5., 4., 0., 2250., timeStartDay, timeEndDay, 'seismic', date.strftime("%Y%m%d"), 'mdv_corr', pathFig)
+plot_2Dmaps(datetimeRadar,rangeRadar,mdv_corr,'mdv corrected', -5., 4., 0., 2250., timeStartDay, timeEndDay, 'seismic', date, 'mdv_corr', pathFig)
 
 
 # applying rolling average to the data
@@ -1018,7 +1018,7 @@ df        = pd.DataFrame(mdv_corr, index=datetimeRadar, columns=rangeRadar)
 mdv_roll3 = df.rolling(window=3,center=True, axis=0).apply(lambda x: np.nanmean(x)) 
 
 # plot of the 2d map of mean doppler velocity corrected for the selected hour with 3 steps running mean applied
-plot_2Dmaps(datetimeRadar,rangeRadar,mdv_roll3.values,'mdv corrected rolling', -5., 4., 0., 2250., timeStartDay, timeEndDay, 'seismic', date.strftime("%Y%m%d"), 'mdv_corr_rolling3', pathFig)
+plot_2Dmaps(datetimeRadar,rangeRadar,mdv_roll3.values,'mdv corrected rolling', -5., 4., 0., 2250., timeStartDay, timeEndDay, 'seismic', date, 'mdv_corr_rolling3', pathFig)
 
 #%%
 
@@ -1155,4 +1155,4 @@ axtt2.set_xticklabels(tick_function(new_tick_locations))
 #ax.set_xlim(0.001, 0.5)
 #ax.set_ylim(10**(-9.), 10)
 fig.tight_layout()
-fig.savefig(pathFig+date.strftime("%Y%m%d")+'_'+hour+'_'+str(i_chirp)+'_fft_check.png', format='png')
+fig.savefig(pathFig+date+'_'+hour+'_'+str(i_chirp)+'_fft_check.png', format='png')
