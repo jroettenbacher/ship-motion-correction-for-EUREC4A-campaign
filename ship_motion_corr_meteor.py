@@ -808,7 +808,7 @@ fig.savefig(pathFig+f'{date:%Y%m%d}_'+hour+'_wship_heave_timeSerie.png', format=
 
 #%%
 # reading radar data 
-radarData          = xr.open_dataset(pathFolderTree+'/meteor_data/D16/'+yy[2:4]+mm+dd+'_'+hour+'0000_P07_ZEN.LV1.nc')
+radarData          = xr.open_mfdataset(f'{pathFolderTree}instruments/LIMRAD94/Y2020/M{mm}/D{dd}/'+yy[2:4]+mm+dd+'_'+hour+'*_P07_ZEN.LV1.NC')
 datetimeRadar      = nc4.num2date(radarData['Time'].values, 'seconds since 2001-01-01 00:00:00', only_use_cftime_datetimes=False)
 C1Range            = radarData['C1Range'].values
 C2Range            = radarData['C2Range'].values
