@@ -31,9 +31,9 @@ NdaysEurec4a = len(Eurec4aDays)
                         # PARAMETERS TO BE SET BY USERS *
 
 # paths to the different data files and output directories for plots
-pathFolderTree  = '/projekt2/remsens/data_new/site-campaign/rv_meteor-eurec4a/'
-pathFig         = pathFolderTree+'/ship_motion_correction/plots/meteor/'
-pathNcDataAnc   = pathFolderTree+'/ship_motion_correction/ncdf_ancillary/'
+pathFolderTree  = '/projekt2/remsens/data_new/site-campaign/rv_meteor-eurec4a'
+pathFig         = f'{pathFolderTree}/ship_motion_correction/plots/meteor'
+pathNcDataAnc   = f'{pathFolderTree}/ship_motion_correction/ncdf_ancillary'
 
 ### instrument position coordinates [+5.15m; +5.40m;−15.60m]
 r_FMCW          = [-11. , 4.07, -15.8] # [m]
@@ -45,7 +45,7 @@ dayEu           = Eurec4aDays[-4]
 yy              = str(dayEu)[0:4]
 mm              = str(dayEu)[5:7]
 dd              = str(dayEu)[8:10]
-date            = yy+mm+dd
+date            = datetime.strptime(yy+mm+dd, "%Y%m%d")
 
 # selecting hour to be processed
 hour            = '16'
@@ -223,7 +223,7 @@ def f_findMdvTimeSerie(values, datetime, rangeHeight, NtimeStampsRun, pathFig, c
     
     ax = plt.subplot(2,1,2)
     ax.spines["top"].set_visible(False)  
-    ax.spines["right"].set_visible(False)  
+    ax.spines["right"].set_visible(False)
     ax.get_xaxis().tick_bottom()  
     ax.get_yaxis().tick_left() 
     matplotlib.rc('xtick', labelsize=labelsizeaxes)  # sets dimension of ticks in the plots
@@ -671,10 +671,10 @@ def tick_function(X):
 
 #%%
 # processing of the selected hour
-print('processing date: '+date)
+print(f'processing date: {date:%Y-%m-%d}')
 print('* reading ship data')
 if Hrz == 1:     
-    dataset      = pd.read_csv(pathFolderTree+'/ship_meteor_data/'+date+'_DSHIP_all_1Hz.dat',\
+    dataset      = pd.read_csv(f'{pathFolderTree}/instruments/RV-METEOR_DSHIP/{date}_DSHIP_all_1Hz.dat',\
                                         sep="\t",  encoding='windows-1252', header=0, skiprows=[1,2])#, \
     timeShipArr  = dataset['SYS.CALC.Timestamp'].values
     unitsShipArr = 'seconds since 1970-01-01 00:00:00'
@@ -800,15 +800,15 @@ ax.legend(frameon=False)
 ax.xaxis_date()
 ax.set_ylim(-1.5,1.5)                                               # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
 ax.set_xlim(timeStartDay, timeEndDay)                                 # limits of the x-axes
-ax.set_title('time serie for the day : '+date+' - no time shift', fontsize=fontSizeTitle, loc='left')
+ax.set_title(f'time serie for the day : {date:%Y-%m-%d} - no time shift', fontsize=fontSizeTitle, loc='left')
 ax.set_xlabel("time [hh:mm:ss]", fontsize=fontSizeX)
 ax.set_ylabel('w [m s-1]', fontsize=fontSizeY)
 fig.tight_layout()
-fig.savefig(pathFig+date+'_'+hour+'_wship_heave_timeSerie.png', format='png')
+fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_wship_heave_timeSerie.png', format='png')
 
 #%%
 # reading radar data 
-radarData          = xr.open_mfdataset(f'{pathFolderTree}instruments/LIMRAD94/Y2020/M{mm}/D{dd}/'+yy[2:4]+mm+dd+'_'+hour+'*_P07_ZEN.LV1.NC')
+radarData          = xr.open_mfdataset(f'{pathFolderTree}instruments/LIMRAD94/Y2020/M{mm}/D{dd}/{date:%y%m%d}_{hour}*_P07_ZEN.LV1.NC')
 datetimeRadar      = nc4.num2date(radarData['Time'].values, 'seconds since 2001-01-01 00:00:00', only_use_cftime_datetimes=False)
 C1Range            = radarData['C1Range'].values
 C2Range            = radarData['C2Range'].values
@@ -996,11 +996,11 @@ for i_chirp in range(0,Nchirps):
     ax.legend(frameon=False)
                                             # limits of the y-axesn  cmap=plt.cm.get_cmap("viridis", 256)
     ax.set_xlim(timeStart,timeEnd)                                 # limits of the x-axes
-    ax.set_title('velocity for time delay calculations : '+date+' '+hour+':'+str(int(hour)+1)+' shift = '+str(timeShiftArray[i_chirp]), fontsize=fontSizeTitle, loc='left')
+    ax.set_title(f'velocity for time delay calculations : {date:%Y-%m-%d} {hour}:{int(hour)+1} shift = {str(timeShiftArray[i_chirp])}', fontsize=fontSizeTitle, loc='left')
     ax.set_xlabel("time [hh:mm:ss]", fontsize=fontSizeX)
     ax.set_ylabel('w [m s-1]', fontsize=fontSizeY)
     fig.tight_layout()
-    fig.savefig(pathFig+date+'_'+hour+'_'+str(i_chirp)+'_timeSerie_wship_wradar.png', format='png')
+    fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_{str(i_chirp)}_timeSerie_wship_wradar.png', format='png')
 
     # building correction term matrix
     correctionMatrix[:,i_h_min:i_h_max] = - np.repeat(W_ship1_exact, len(rangeChirp)).reshape(len(timeExact), len(rangeChirp))
@@ -1155,4 +1155,4 @@ axtt2.set_xticklabels(tick_function(new_tick_locations))
 #ax.set_xlim(0.001, 0.5)
 #ax.set_ylim(10**(-9.), 10)
 fig.tight_layout()
-fig.savefig(pathFig+date+'_'+hour+'_'+str(i_chirp)+'_fft_check.png', format='png')
+fig.savefig(f'{pathFig}/{date:%Y%m%d}_{hour}_{str(i_chirp)}_fft_check.png', format='png')
