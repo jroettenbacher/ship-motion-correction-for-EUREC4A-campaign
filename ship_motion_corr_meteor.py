@@ -7,9 +7,6 @@
 
 """
 # importing necessary libraries
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import numpy as np
 import netCDF4 as nc4
 from netCDF4 import Dataset
@@ -34,9 +31,9 @@ NdaysEurec4a = len(Eurec4aDays)
                         # PARAMETERS TO BE SET BY USERS *
 
 # paths to the different data files and output directories for plots
-pathFolderTree  = '/Volumes/Extreme SSD/ship_motion_correction_merian/'
-pathFig         = pathFolderTree+'/plots/meteor/'
-pathNcDataAnc   = pathFolderTree+'/ncdf_ancillary/'
+pathFolderTree  = '/projekt2/remsens/data_new/site-campaign/rv_meteor-eurec4a/'
+pathFig         = pathFolderTree+'/ship_motion_correction/plots/meteor/'
+pathNcDataAnc   = pathFolderTree+'/ship_motion_correction/ncdf_ancillary/'
 
 ### instrument position coordinates [+5.15m; +5.40m;−15.60m]
 r_FMCW          = [-11. , 4.07, -15.8] # [m]
@@ -433,7 +430,7 @@ def plot_timeSeries(x,y, ystring,ymin, ymax, timeStartDay, timeEndDay, date, yVa
     ax.set_ylabel(ystring, fontsize=fontSizeY)
     fig.tight_layout()
     fig.savefig(pathFig+date+'_'+yVarName+'_timeSerie.png', format='png')
-def read_seapath(date, path=pathFolderTree+'/ship_meteor_data/', **kwargs):
+def read_seapath(date, path=pathFolderTree+'/instruments/RV-METEOR_DSHIP/', **kwargs):
     """
     author: Johannes Roettenbacher
     goal: Read in Seapath measurements from ship from .dat files to a pandas.DataFrame
@@ -451,7 +448,10 @@ def read_seapath(date, path=pathFolderTree+'/ship_meteor_data/', **kwargs):
     # unpack kwargs
     nrows = kwargs['nrows'] if 'nrows' in kwargs else None
     skiprows = kwargs['skiprows'] if 'skiprows' in kwargs else (1, 2)
-    file = date+'_DSHIP_seapath_10Hz.dat'
+    if date < datetime.datetime(2020, 1, 27):
+        file = f"{date:%Y%m%d}_DSHIP_seapath_1Hz.dat"
+    else:
+        file = f"{date:%Y%m%d}_DSHIP_seapath_10Hz.dat"
     # set encoding and separator, skip the rows with the unit and type of measurement
     seapath = pd.read_csv(path+file, encoding='windows-1252', sep="\t", skiprows=skiprows,
                           index_col='date time', nrows=nrows)
