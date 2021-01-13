@@ -58,20 +58,20 @@ selHeight = 1600.  # height in the chirp 1
 
 # definitions of functions necessary for the processing 
 def f_closest(array, value):
-    '''
+    """
     # closest function
     #---------------------------------------------------------------------------------
     # date :  16.10.2017
     # author: Claudia Acquistapace
     # goal: return the index of the element of the input array that in closest to the value provided to the function
-    '''
+    """
     import numpy as np
     idx = (np.abs(array - value)).argmin()
     return idx
 
 
 def f_readShipDataset(shipDataName):
-    '''
+    """
     Created on Mer Sep 30 16:06:20 2020
 
     @author: cacquist
@@ -94,7 +94,7 @@ def f_readShipDataset(shipDataName):
     relWindDir
     relWindSpeed
     heading2
-    '''
+    """
     import pandas as pd
     import xarray as xr
 
@@ -124,7 +124,7 @@ def f_readShipDataset(shipDataName):
 
 
 def f_findMdvTimeSerie(values, datetime, rangeHeight, NtimeStampsRun, pathFig, chirp):
-    '''
+    """
     author: Claudia Acquistapace
     date: 25 november 2020
     goal : identify, given a mean doppler velocity matrix, a sequence of lenght 
@@ -152,7 +152,7 @@ def f_findMdvTimeSerie(values, datetime, rangeHeight, NtimeStampsRun, pathFig, c
     to the minimum amount of nan values found in the serie 
     -------
     
-    '''
+    """
     import pandas as pd
     import matplotlib as mpl
     import matplotlib.pyplot as plt
@@ -301,7 +301,7 @@ def plot_2Dmaps(time, height, y, ystring, ymin, ymax, hmin, hmax, timeStartDay, 
 
 
 def f_shiftTimeDataset(dataset):
-    '''
+    """
     author: Claudia Acquistapace
     date: 25 november 2020
     goal : function to shift time variable of the dataset to the central value of the time interval
@@ -310,7 +310,7 @@ def f_shiftTimeDataset(dataset):
         dataset: xarray dataset
     output:
         dataset: xarray dataset with the time coordinate shifted added to the coordinates and the variables now referring to the shifted time array
-    '''
+    """
     # reading time array
     time = dataset['time'].values
     # calculating deltaT using consecutive time stamps
@@ -324,7 +324,7 @@ def f_shiftTimeDataset(dataset):
 
 
 def f_calcRMatrix(rollShipArr, pitchShipArr, yawShipArr, NtimeShip):
-    '''
+    """
     author: Claudia Acquistapace
     date : 27/10/2020
     goal: function to calculate R matrix given roll, pitch, yaw
@@ -335,7 +335,7 @@ def f_calcRMatrix(rollShipArr, pitchShipArr, yawShipArr, NtimeShip):
         NtimeShip: dimension of time array for the definition of R_inv as [3,3,dimTime]
     output: 
         R[3,3,Dimtime]: array of rotational matrices, one for each time stamp
-    '''
+    """
     # calculation of the rotational matrix for each time stamp of the ship data for the day
     cosTheta = np.cos(np.deg2rad(rollShipArr))
     senTheta = np.sin(np.deg2rad(rollShipArr))
@@ -381,7 +381,7 @@ def f_calcRMatrix(rollShipArr, pitchShipArr, yawShipArr, NtimeShip):
     C = np.moveaxis(C, 2, 0)
     R = np.matmul(C, np.matmul(B, A))
     R = np.moveaxis(R, 0, 2)
-    return (R)
+    return R
 
 
 def plot_timeSeries(x, y, ystring, ymin, ymax, timeStartDay, timeEndDay, date, yVarName, pathFig):
@@ -475,7 +475,7 @@ def read_seapath(date, path=pathFolderTree + '/instruments/RV-METEOR_DSHIP/', **
 
 
 def f_calculateExactRadarTime(millisec, chirpIntegrations, datetimeRadar):
-    '''
+    """
     date   : 23/11/2020
     author : Claudia Acquistapace
     contact: cacquist@uni-koeln.de
@@ -496,7 +496,7 @@ def f_calculateExactRadarTime(millisec, chirpIntegrations, datetimeRadar):
         timeChirp1 = datetime[0,:]
         timeChirp2 = datetime[1,:] 
         timeChirp3 = datetime[2,:] 
-    '''
+    """
 
     # converting time in seconds since 1970
     timeRadar = datetimeRadar[:].astype('datetime64[s]').astype('int')  # time in seconds since 1970
@@ -519,7 +519,7 @@ def f_calculateExactRadarTime(millisec, chirpIntegrations, datetimeRadar):
 
 
 def f_calcTimeShift(w_radar_meanCol, DeltaTimeShift, w_ship_chirp, timeSerieRadar, pathFig, chirp, date, hour):
-    '''             
+    """
     author: Claudia Acquistapace, Jan. H. Schween
     date:   25/11/2020
     goal:   calculate and estimation of the time lag between the radar time stamps and the ship time stamp
@@ -559,7 +559,7 @@ def f_calcTimeShift(w_radar_meanCol, DeltaTimeShift, w_ship_chirp, timeSerieRada
         DESCRIPTION: time lag for each chirp in seconds   
     -------
 
-    '''
+    """
     from scipy.interpolate import CubicSpline
 
     labelsizeaxes = 12
@@ -636,7 +636,7 @@ def f_calcTimeShift(w_radar_meanCol, DeltaTimeShift, w_ship_chirp, timeSerieRada
 
 
 def f_calcFftSpectra(vel, time):
-    '''
+    """
     author: Claudia Acquistapace
     goal  :function to calculate fft spectra of a velocity time series
     date  : 07.12.2020
@@ -652,7 +652,7 @@ def f_calcFftSpectra(vel, time):
     w_pow power spectra obtained with fft transform of the velocity time serie
     freq  corresponding frequencies
 
-    '''
+    """
     import numpy as np
     w_fft = np.fft.fft(vel)
     N = len(w_fft)
@@ -691,7 +691,6 @@ def tick_function(X):
 
 
 ######################################################################################
-
 # %%
 # processing of the selected hour
 print(f'processing date: {date:%Y-%m-%d}')
@@ -746,8 +745,7 @@ heaveHour = shipDataHourCenter['heave'].values
 timeShipHour = pd.to_datetime(shipDataHourCenter['time_shifted'].values)
 w_heave = np.zeros(len(timeShipHour))
 for i in range(1, len(timeShipHour)):
-    w_heave[i] = (heaveHour[i] - heaveHour[i - 1]) / \
-                 (timeShipHour[i] - timeShipHour[i - 1]).total_seconds()
+    w_heave[i] = (heaveHour[i] - heaveHour[i - 1]) / (timeShipHour[i] - timeShipHour[i - 1]).total_seconds()
 
 # calculating rotational terms 
 rollHour = shipDataHourCenter['roll'].values
@@ -764,8 +762,7 @@ for i in range(NtimeShip):
 # calculating vertical component of the velocity of the radar on the ship (v_rot)
 w_rot = np.zeros(len(timeShipHour))
 for i in range(1, len(timeShipHour)):
-    w_rot[i] = (r_ship[2, i] - r_ship[2, i - 1]) / \
-               (timeShipHour[i] - timeShipHour[i - 1]).total_seconds()
+    w_rot[i] = (r_ship[2, i] - r_ship[2, i - 1]) / (timeShipHour[i] - timeShipHour[i - 1]).total_seconds()
 
 # calculating total ship velocity
 w_ship = w_rot + w_heave
